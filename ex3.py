@@ -73,7 +73,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # --------------------------------------------------------------------  Implement train and evaluation procedures
 # Define the training function
-def train(model, dataloader, optimizer, criterion, i):
+def train(model, dataloader, optimizer, criterion):
     model.train()
     for test, (data, target) in enumerate(dataloader):
         # data = data.to(device)
@@ -84,9 +84,10 @@ def train(model, dataloader, optimizer, criterion, i):
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
-        if (i+1) % 100 == 0:
-            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
-                  .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+        # print(i)
+        # if (i+1) % 100 == 0:
+        #     print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+        #           .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
 
 
 # Define the evaluation function
@@ -126,14 +127,14 @@ test_acc_history = []
 
 total_step = len(train_dataloader)
 for epoch in range(num_epochs):
-    for i, (data, label) in enumerate(train_dataloader):
-        train(model, train_dataloader, optimizer, criterion, i)
-        train_loss, train_acc = evaluate(model, train_dataloader, criterion)
-        test_loss, test_acc = evaluate(model, test_dataloader, criterion)
-        train_loss_history.append(train_loss)
-        test_loss_history.append(test_loss)
-        test_acc_history.append(test_acc)
-    print(f'Epoch {epoch}: Train Loss {train_loss:.6f}, Train Acc {train_acc:.2f}%, Test Loss {test_loss:.6f}, Test Acc {test_acc:.2f}%')
+    # for i, (data, label) in enumerate(train_dataloader):
+    train(model, train_dataloader, optimizer, criterion)
+    train_loss, train_acc = evaluate(model, train_dataloader, criterion)
+    test_loss, test_acc = evaluate(model, test_dataloader, criterion)
+    train_loss_history.append(train_loss)
+    test_loss_history.append(test_loss)
+    test_acc_history.append(test_acc)
+print(f'Epoch {epoch}: Train Loss {train_loss:.6f}, Train Acc {train_acc:.2f}%, Test Loss {test_loss:.6f}, Test Acc {test_acc:.2f}%')
 # -------------------------------------------------------------------- //
 
 # # Train the network
