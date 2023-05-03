@@ -96,21 +96,40 @@ def evaluate(model, dataloader, criterion):
     running_accuracy = 0
     with torch.no_grad():
         for data, target in dataloader:
-            data = data.to(device)
+            # data = data.to(device)
+            data = data.reshape(-1, input_size).to(device)
             target = target.to(device)
             output = model(data)
             loss = criterion(output, target)
             running_loss += loss.item()
-            # running_loss += loss.item()
             pred = output.argmax(dim=1, keepdim=True)
             # predicted = torch.max(output, 1)
             # running_accuracy += (predicted == target).sum().item()
             running_accuracy += pred.eq(target.view_as(pred)).sum().item()
-            running_accuracy = 100. * \
-                running_accuracy / len(dataloader.dataset)
+            # running_accuracy = 100. * \
+            #     running_accuracy / len(dataloader.dataset)
     epoch_loss = running_loss / len(dataloader.dataset)
     epoch_accuracy = running_accuracy / len(dataloader.dataset)
     return epoch_loss, epoch_accuracy
+
+
+# train the model
+last_lose_test = []
+last_lose_train = []
+train_loss_history = []
+test_loss_history = []
+test_acc_history = []
+
+total_step = len(train_dataloader)
+for epoch in range(num_epochs):
+    for i, (data, label) in enumerate(train_dataloader):
+        train(model, train_dataloader, optimizer, criterion, i)
+        train_loss, train_acc = evaluate(model, train_dataloader, criterion)
+        test_loss, test_acc = evaluate(model, test_dataloader, criterion)
+        train_loss_history.append(train_loss)
+        test_loss_history.append(test_loss)
+        test_acc_history.append(test_acc)
+        print(f'Epoch {epoch}: Train Loss {train_loss:.6f}, Train Acc {train_acc:.2f}%, Test Loss {test_loss:.6f}, Test Acc {test_acc:.2f}%')
 # -------------------------------------------------------------------- //
 
 # # Train the network
@@ -163,26 +182,8 @@ def evaluate(model, dataloader, criterion):
 # plt.show()
 
 
-# train the model
-
-last_lose_test = []
-last_lose_train = []
-train_loss_history = []
-test_loss_history = []
-test_acc_history = []
-
-total_step = len(train_dataloader)
-for epoch in range(num_epochs):
-    for i, (data, label) in enumerate(train_dataloader):
-        train(model, train_dataloader, optimizer, criterion, i)
-        train_loss, train_acc = evaluate(model, train_dataloader, criterion)
-        test_loss, test_acc = evaluate(model, test_dataloader, criterion)
-        train_loss_history.append(train_loss)
-        test_loss_history.append(test_loss)
-        test_acc_history.append(test_acc)
-        print(f'Epoch {epoch}: Train Loss {train_loss:.6f}, Train Acc {train_acc:.2f}%, Test Loss {test_loss:.6f}, Test Acc {test_acc:.2f}%')
-last_lose_train.append(train_loss_history[4])
-last_lose_test.append(test_loss_history[4])
+# last_lose_train.append(train_loss_history[4])
+# last_lose_test.append(test_loss_history[4])
 
 # print('Accuracy of the network on the 10000 test images: {} %'.format(
 #     100 * correct / total))
