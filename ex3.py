@@ -93,7 +93,7 @@ def train(model, dataloader, optimizer, criterion, i):
 def evaluate(model, dataloader, criterion):
     model.eval()
     running_loss = 0
-    running_accuracy = 0.0
+    running_accuracy = 0
     with torch.no_grad():
         for data, target in dataloader:
             # data = data.to(device)
@@ -111,8 +111,9 @@ def evaluate(model, dataloader, criterion):
             running_loss += loss.item() * data.size(0)
             _, predicted = torch.max(data, 1)
             running_accuracy += (predicted == target).sum().item()
+            # running_accuracy += torch.sum(predicted == target)
     epoch_loss = running_loss / len(dataloader.dataset)
-    epoch_accuracy = running_accuracy / len(dataloader.dataset)
+    epoch_accuracy = 100. * running_accuracy / len(dataloader.dataset)
     return epoch_loss, epoch_accuracy
 
 
@@ -132,7 +133,7 @@ for epoch in range(num_epochs):
         train_loss_history.append(train_loss)
         test_loss_history.append(test_loss)
         test_acc_history.append(test_acc)
-        print(f'Epoch {epoch}: Train Loss {train_loss:.6f}, Train Acc {train_acc:.2f}%, Test Loss {test_loss:.6f}, Test Acc {test_acc:.2f}%')
+    print(f'Epoch {epoch}: Train Loss {train_loss:.6f}, Train Acc {train_acc:.2f}%, Test Loss {test_loss:.6f}, Test Acc {test_acc:.2f}%')
 # -------------------------------------------------------------------- //
 
 # # Train the network
