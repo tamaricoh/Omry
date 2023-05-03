@@ -93,7 +93,7 @@ def train(model, dataloader, optimizer, criterion, i):
 def evaluate(model, dataloader, criterion):
     model.eval()
     running_loss = 0
-    running_accuracy = 0
+    running_accuracy = 0.0
     with torch.no_grad():
         for data, target in dataloader:
             # data = data.to(device)
@@ -101,13 +101,16 @@ def evaluate(model, dataloader, criterion):
             target = target.to(device)
             output = model(data)
             loss = criterion(output, target)
-            running_loss += loss.item()
-            pred = output.argmax(dim=1, keepdim=True)
+            # running_loss += loss.item() * data.size(0)
+            # # pred = output.argmax(dim=1, keepdim=True)
             # predicted = torch.max(output, 1)
             # running_accuracy += (predicted == target).sum().item()
-            running_accuracy += pred.eq(target.view_as(pred)).sum().item()
-            # running_accuracy = 100. * \
-            #     running_accuracy / len(dataloader.dataset)
+            # # running_accuracy += pred.eq(target.view_as(pred)).sum().item()
+            # # running_accuracy = 100. * \
+            # # running_accuracy / len(dataloader.dataset)
+            running_loss += loss.item() * data.size(0)
+            _, predicted = torch.max(data, 1)
+            running_accuracy += (predicted == target).sum().item()
     epoch_loss = running_loss / len(dataloader.dataset)
     epoch_accuracy = running_accuracy / len(dataloader.dataset)
     return epoch_loss, epoch_accuracy
